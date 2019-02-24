@@ -4,9 +4,9 @@
 %table#movies
   %thead
     %tr
-      %th <a href="https://www.w3schools.com">Movie Title</a>
+      %th{:class => "#{'hilite' if @movie_title_yellow}"} <a href=#{movies_path(:orderByHeader => true)} id="title_header">Movie Title</a>
       %th Rating
-      %th Release Date
+      %th{:class => "#{'hilite' if @release_date_yellow}"} <a href=#{movies_path(:orderByDate => true)} id="release_date_header">Release Date</a>
       %th More Info
   %tbody
     - @movies.each do |movie|
