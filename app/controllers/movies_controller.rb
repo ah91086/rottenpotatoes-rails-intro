@@ -11,18 +11,33 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings = Movie.get_ratings
+    shouldInclude = []
+    retrievedHash = params["ratings"]
+    if retrievedHash != nil
+      for rating in @all_ratings do 
+        if retrievedHash.key?(rating)
+          shouldInclude.push(rating)
+        end
+      end
+    end
+
     @movie_title_yellow = false
     @release_date_yellow = false
+
     if params[:orderByHeader]
-      @movies = Movie.order(:title)
+      # @movies = Movie.order(:title)
+      @movies = Movie.with_ratings(shouldInclude, :title)
       @movie_title_yellow = true
     elsif params[:orderByDate] 
-      @movies = Movie.order(:release_date)
+      # @movies = Movie.order(:release_date)
+      @movies = Movie.with_ratings(shouldInclude, :release_date)
       @release_date_yellow = true
     else
-      @movies = Movie.all
+      @movies = Movie.with_ratings(shouldInclude, nil)
     end
   end
+
 
   def new
     # default: render 'new' template
