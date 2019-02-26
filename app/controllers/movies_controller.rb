@@ -29,25 +29,10 @@ class MoviesController < ApplicationController
     retrievedHash = params["ratings"]
 
 
-    # if @first_iteration
-    #   @first_iteration = false
-    #   session[:filterSettings] = 
-
-    # session[:filterSettings]
-
-
-
-
-
-
-
-    #we set the default value of check boxes to checked but idk if thats reflected in the retrievedHash
-
     retrievedHash = params["ratings"]
     if retrievedHash == nil ||  retrievedHash.length == 0
       shouldInclude = session[:filterSettings]
     else
-      # if retrievedHash != nil
 
       for rating in @all_ratings do 
         if retrievedHash.key?(rating)
@@ -55,52 +40,54 @@ class MoviesController < ApplicationController
         end
       end
 
-
-      # end
-
       session[:filterSettings] = shouldInclude
 
     end
 
 
-
-
-
-
-
-
-
-
     @movie_title_yellow = false
     @release_date_yellow = false
-
-    # if @first_iteration
-    #   @first_iteration = false
-    #   shouldInclude = Movie.get_ratings
-
-    #   @movie_title_yellow = true
-    #   @release_date_yellow = true
-    # end
-
-    # @movie_title_yellow = true
-    # @release_date_yellow = true
 
 
 
     if params[:orderByHeader]
+
       session[:orderByHeader] = true
       session[:orderByDate] = false
 
-      # @movies = Movie.order(:title)
-      @movies = Movie.with_ratings(shouldInclude, :title)
-      @movie_title_yellow = true
+
+      if shouldInclude.length != @all_ratings.length
+
+        ratingsHash = Hash.new
+        for r in shouldInclude do
+          ratingsHash[r] = "true"
+        end
+
+        redirect_to "ratings"=>ratingsHash
+      else
+
+        @movies = Movie.with_ratings(shouldInclude, :title)
+        @movie_title_yellow = true
+      end 
     elsif params[:orderByDate] 
-      # @movies = Movie.order(:release_date)
+
       session[:orderByDate] = true
       session[:orderByHeader] = false
 
-      @movies = Movie.with_ratings(shouldInclude, :release_date)
-      @release_date_yellow = true
+      if shouldInclude.length != @all_ratings.length
+
+        ratingsHash = Hash.new
+        for r in shouldInclude do
+          ratingsHash[r] = "true"
+        end
+
+        redirect_to "ratings"=>ratingsHash
+
+      else
+
+        @movies = Movie.with_ratings(shouldInclude, :release_date)
+        @release_date_yellow = true
+      end
     else
       @movies = Movie.with_ratings(shouldInclude, nil)
     end
@@ -110,6 +97,7 @@ class MoviesController < ApplicationController
       @movie_title_yellow = true
       @movies = Movie.with_ratings(shouldInclude, :title)
     end
+
 
     if session[:orderByDate]
       @release_date_yellow = true
