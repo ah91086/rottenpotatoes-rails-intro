@@ -117,9 +117,10 @@ class MoviesController < ApplicationController
 
           else
             if session[:orderByDate]
-              @movies = Movie.order(:release_date)
+              redirect_to "ratings"=>shouldInclude, "orderByDate"=>"true"
+              # redirect_to 
             else
-              @movies = Movie.order(:title)
+              redirect_to "ratings"=>ratingsHash, "orderByHeader"=>"true"
             end
           end
         else
