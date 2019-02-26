@@ -32,7 +32,38 @@ class MoviesController < ApplicationController
 
     retrievedHash = params["ratings"]
     if retrievedHash == nil ||  retrievedHash.length == 0
-      shouldInclude = session[:filterSettings]
+
+        ratingsHash = Hash.new
+        for r in session[:filterSettings] do
+          ratingsHash[r] = "true"
+        end
+        # || session[:orderByHeader]
+      if params[:orderByHeader] 
+        session[:orderByHeader] = true
+        session[:orderByDate] = false
+
+        redirect_to "ratings"=>ratingsHash, "orderByHeader"=>"true"
+        return
+         # || session[:orderByDate]
+      elsif params[:orderByDate]
+        session[:orderByDate] = true
+        session[:orderByHeader] = false
+        redirect_to "ratings"=>ratingsHash, "orderByDate"=>"true"
+        return
+
+      elsif session[:orderByHeader]
+        redirect_to "ratings"=>ratingsHash, "orderByHeader"=>"true"
+        return
+      elsif session[:orderByDate]
+        redirect_to "ratings"=>ratingsHash, "orderByDate"=>"true"
+        return
+        
+      else 
+        redirect_to "ratings"=>ratingsHash
+        return
+      end
+
+
     else
 
       for rating in @all_ratings do 
@@ -52,12 +83,15 @@ class MoviesController < ApplicationController
 
     if params.length == 0
       redirect_to "ratings"=>shouldInclude
+      return
     elsif params[:orderByHeader] and params["ratings"]
       @movie_title_yellow = true
       @movies = Movie.with_ratings(params["ratings"].keys, :title)
+      return
     elsif params[:orderByDate] and params["ratings"]
       @release_date_yellow = true
       @movies = Movie.with_ratings(params["ratings"].keys, :release_date)
+      return
     else
       if params[:orderByHeader]
 
@@ -73,10 +107,13 @@ class MoviesController < ApplicationController
           end
 
           redirect_to "ratings"=>ratingsHash,  "orderByHeader"=>"true"
+          return
+
         else
 
           @movies = Movie.order(:title)
           @movie_title_yellow = true
+          return
         end 
 
       elsif params[:orderByDate] 
@@ -92,11 +129,13 @@ class MoviesController < ApplicationController
           end
 
           redirect_to "ratings"=>ratingsHash, "orderByDate"=>"true"
+          return
 
         else
 
           @movies = Movie.order(:release_date)
           @release_date_yellow = true
+          return
         end
 
       else
@@ -111,20 +150,26 @@ class MoviesController < ApplicationController
 
             if session[:orderByDate]
               redirect_to "ratings"=>ratingsHash, "orderByDate"=>"true"
+              return
             else
               redirect_to "ratings"=>ratingsHash, "orderByHeader"=>"true"
+              return
             end
 
           else
             if session[:orderByDate]
               redirect_to "ratings"=>shouldInclude, "orderByDate"=>"true"
+              return
               # redirect_to 
             else
               redirect_to "ratings"=>ratingsHash, "orderByHeader"=>"true"
+              return
             end
           end
         else
+
           @movies = Movie.with_ratings(shouldInclude, nil)
+          return
         end
       end
     end
