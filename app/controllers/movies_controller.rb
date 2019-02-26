@@ -49,7 +49,10 @@ class MoviesController < ApplicationController
     @movie_title_yellow = false
     @release_date_yellow = false
 
-    if params[:orderByHeader] and params["ratings"]
+
+    if params.length == 0
+      redirect_to "ratings"=>shouldInclude
+    elsif params[:orderByHeader] and params["ratings"]
       @movie_title_yellow = true
       @movies = Movie.with_ratings(params["ratings"].keys, :title)
     elsif params[:orderByDate] and params["ratings"]
@@ -97,23 +100,7 @@ class MoviesController < ApplicationController
         end
 
       else
-        # if shouldInclude.length != @all_ratings.length && session[:orderByDate]
-
-          # ratingsHash = Hash.new
-          # for r in shouldInclude do
-          #   ratingsHash[r] = "true"
-          # end
-
-        #   redirect_to "ratings"=>ratingsHash,  "orderByDate"=>"true"
-        # elsif if shouldInclude.length != @all_ratings.length && session[:orderByHeader]
-
-        #   ratingsHash = Hash.new
-        #   for r in shouldInclude do
-        #     ratingsHash[r] = "true"
-        #   end
-
-        #   redirect_to "ratings"=>ratingsHash,  "orderByDate"=>"true"
-
+        
         if session[:orderByDate] || session[:orderByHeader]
           if shouldInclude.length != @all_ratings.length
 
